@@ -2,28 +2,16 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <assert.h>
-
-char vertexShaderSource[] = "#version 330 core\n\
-layout(location = 0) in vec3 aPos;\n\
-\n\
-void main() {\n\
-	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n\
-}";
-
-char fragmentShaderSource[] = "#version 330 core\n\
-out vec4 FragColor;\n\
-\n\
-void main() {\n\
-	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n\
-}";
+#include "Shader.h"
 
 float triangle[] = {
-	-0.5f, -0.5f, 0.0f, // left  
-	0.5f, -0.5f, 0.0f, // right 
-	0.0f,  0.5f, 0.0f  // top   
+	// positions         // colors
+	0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+	0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
 };
 
-int triangleIndices[] = {
+unsigned int triangleIndices[] = {
 	0, 1, 2
 };
 
@@ -47,13 +35,21 @@ void processInput(GLFWwindow *window) {
 		glfwSetWindowShouldClose(window, true);
 }
 
-GLuint createVBO(float *vertices, unsigned int length) {
+void setVboData(GLuint vbo, float *vertices, unsigned int length) {
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, length, vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+GLuint createVBO(float *vertices, unsigned int length, unsigned int stride) {
 	GLuint VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, length, vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(3*sizeof(float)));
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	return VBO;
 }
@@ -65,24 +61,6 @@ GLuint createEBO(unsigned int *indices, int indicesLength) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesLength, indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	return EBO;
-}
-
-GLuint createShader(char *sourceCode, GLuint shaderType) {
-	GLuint shader;
-	shader = glCreateShader(shaderType);
-	glShaderSource(shader, 1, &sourceCode, NULL);
-	glCompileShader(shader);
-
-	int success;
-	char infoLog[512];
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-		assert(false);
-	}
-
-	return shader;
 }
 
 GLFWwindow* createWindow(unsigned int xDim, unsigned int yDim) {
@@ -109,43 +87,17 @@ GLFWwindow* createWindow(unsigned int xDim, unsigned int yDim) {
 	return window;
 }
 
-GLuint linkShaderProgram(GLuint vertexShader, GLuint fragmentShader) {
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	int success;
-	char infoLog[512];
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-		assert(false);
-	}
-
-	return shaderProgram;
-}
-
 int main() {
-
 	auto window = createWindow(800, 600);
-
-	auto vertexShader = createShader(vertexShaderSource, GL_VERTEX_SHADER);
-	auto fragmentShader = createShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
-	auto shaderProgram = linkShaderProgram(vertexShader, fragmentShader);
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	
+	Shader myShader("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
 	unsigned int VBO, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
-	VBO = createVBO(rectangle, sizeof(rectangle));
-	EBO = createEBO(rectangleIndices, sizeof(rectangleIndices));
+	VBO = createVBO(triangle, sizeof(triangle), 6);
+	EBO = createEBO(triangleIndices, sizeof(triangleIndices));
 	glBindVertexArray(0);
-
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -154,8 +106,8 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// draw our first triangle
-		glUseProgram(shaderProgram);
+		myShader.use();
+
 		glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
