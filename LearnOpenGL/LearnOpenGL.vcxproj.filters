@@ -17,13 +17,20 @@
       <UniqueIdentifier>{f9619c5b-230c-494c-83e9-c157e5b65a79}</UniqueIdentifier>
       <Extensions>glsl;</Extensions>
     </Filter>
+    <Filter Include="External libs">
+      <UniqueIdentifier>{2289aa79-c25f-4e7e-8dfb-cc3e01c5a09b}</UniqueIdentifier>
+      <Extensions>c;cpp;</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="glad.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glad.c">
+      <Filter>External libs</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>External libs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

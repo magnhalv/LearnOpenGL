@@ -51,7 +51,6 @@ void Shader::setFloat(const std::string &name, float value) const {
 }
 
 std::string Shader::readFile(const GLchar *path) const {
-	
 	try {
 		std::string vertexCode;
 		std::ifstream file;	
@@ -64,8 +63,8 @@ std::string Shader::readFile(const GLchar *path) const {
 		file.close();
 		return fileStream.str();
 	}
-	catch (std::ifstream::failure e) {
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+	catch (std::ifstream::failure &e) {		
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << std::endl;
 		throw new std::exception("Could not open shader file.");
 	}	
 }
