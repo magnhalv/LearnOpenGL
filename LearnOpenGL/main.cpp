@@ -94,7 +94,7 @@ GLFWwindow* createWindow(unsigned int xDim, unsigned int yDim) {
 	return window;
 }
 
-GLuint generateTexture(const char *path) {
+GLuint generateTexture(const char *path, bool hasAlpha) {
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -105,9 +105,11 @@ GLuint generateTexture(const char *path) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true);
 	unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
 	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		GLuint dataType = hasAlpha ? GL_RGBA : GL_RGB;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, dataType, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
@@ -121,6 +123,7 @@ int main() {
 	auto window = createWindow(800, 600);
 	
 	Shader myShader("./shaders/vertex.glsl", "./shaders/fragment.glsl");
+	myShader.use();
 
 	GLuint VBO, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
@@ -129,19 +132,28 @@ int main() {
 	EBO = createEBO(rectangleIndices, sizeof(rectangleIndices));
 	glBindVertexArray(0);
 	
-	auto texture = generateTexture("./textures/wood_container.jpg");
+	auto texture1 = generateTexture("./textures/wood_container.jpg", false);
+	auto texture2 = generateTexture("./textures/awesomeface.png", true);
+	
+
+	glUniform1i(glGetUniformLocation(myShader.ID, "texture1"), 0);
+	glUniform1i(glGetUniformLocation(myShader.ID, "texture2"), 1);	
 
 	while (!glfwWindowShouldClose(window)) {
 
 		processInput(window);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT);		
+	
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture1);
 
-		myShader.use();
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
 
-		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO);
+
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
