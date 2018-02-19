@@ -1,5 +1,4 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include <glad/glad.h> // include glad to get all the required OpenGL headers
 
@@ -24,7 +23,6 @@ private:
 	GLuint createShader(const char *sourceCode, GLuint shaderType);
 	GLuint linkShaderProgram(GLuint vertexShader, GLuint fragmentShader);
 };
-#endif
 
 Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath) {		
 	std::string vShaderCode = readFile(vertexPath);

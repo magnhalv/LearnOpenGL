@@ -3,7 +3,10 @@
 #include <iostream>
 #include <assert.h>
 #include "Shader.h"
+#include "InputHandler.h"
 #include <stb_image\stb_image.h>
+
+float ratio = 0;
 
 float triangle[] = {
 	// positions         // colors
@@ -32,9 +35,18 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+void processInput(InputHandler &input, GLFWwindow *window) {
+	if (input.keyPressed(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(window, true);
+	}
+
+	if (input.keyPressed(GLFW_KEY_UP)) {
+		ratio = ratio >= 1 ? 1 : ratio + 0.1;
+	}
+
+	if (input.keyPressed(GLFW_KEY_DOWN)) {
+		ratio = ratio <= 0 ? 0 : ratio - 0.1;
+	}
 }
 
 void setVboData(GLuint vbo, float *vertices, unsigned int length) {
@@ -138,14 +150,20 @@ int main() {
 
 	glUniform1i(glGetUniformLocation(myShader.ID, "texture1"), 0);
 	glUniform1i(glGetUniformLocation(myShader.ID, "texture2"), 1);	
+	
+	int ratioLocation = glGetUniformLocation(myShader.ID, "ratio");	
+
+	InputHandler input(window);
 
 	while (!glfwWindowShouldClose(window)) {
 
-		processInput(window);
+		processInput(input, window);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);		
 	
+		glUniform1f(ratioLocation, ratio);
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
 
