@@ -258,8 +258,13 @@ int main() {
 		{
 			glm::mat4 model;
 			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			float angle = glm::radians(20.0f * i);
+
+			if (i % 3 == 0) {
+				angle = (float)glfwGetTime()*glm::radians(50.0f);
+			}
+
+			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
 			int modelLoc = glGetUniformLocation(myShader.ID, "model");
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
