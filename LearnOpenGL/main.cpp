@@ -6,6 +6,10 @@
 #include "InputHandler.h"
 #include <stb_image\stb_image.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 float ratio = 0;
 
 float triangle[] = {
@@ -131,6 +135,25 @@ GLuint generateTexture(const char *path, bool hasAlpha) {
 	return texture;
 }
 
+void applyClipMatrix(const Shader &shader) {
+
+	glm::mat4 model;
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+	int modelLoc = glGetUniformLocation(shader.ID, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	
+	glm::mat4 view;	
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	int viewLoc = glGetUniformLocation(shader.ID, "view");
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+	glm::mat4 projection;
+	projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
+	int projectionLoc = glGetUniformLocation(shader.ID, "projection");
+	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+}
+
 int main() {
 	auto window = createWindow(800, 600);
 	
@@ -154,7 +177,7 @@ int main() {
 	int ratioLocation = glGetUniformLocation(myShader.ID, "ratio");	
 
 	InputHandler input(window);
-
+	applyClipMatrix(myShader);
 	while (!glfwWindowShouldClose(window)) {
 
 		processInput(input, window);
