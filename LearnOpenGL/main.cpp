@@ -78,6 +78,19 @@ float rectangle[] = {
 };
 
 
+glm::vec3 cubePositions[] = {
+	glm::vec3(0.0f,  0.0f,  0.0f),
+	glm::vec3(2.0f,  5.0f, -15.0f),
+	glm::vec3(-1.5f, -2.2f, -2.5f),
+	glm::vec3(-3.8f, -2.0f, -12.3f),
+	glm::vec3(2.4f, -0.4f, -3.5f),
+	glm::vec3(-1.7f,  3.0f, -7.5f),
+	glm::vec3(1.3f, -2.0f, -2.5f),
+	glm::vec3(1.5f,  2.0f, -2.5f),
+	glm::vec3(1.5f,  0.2f, -1.5f),
+	glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
 unsigned int rectangleIndices[] = {  // note that we start from 0!
 	0, 1, 3,   // first triangle
 	1, 2, 3    // second triangle
@@ -187,14 +200,7 @@ GLuint generateTexture(const char *path, bool hasAlpha) {
 	return texture;
 }
 
-void applyClipMatrix(const Shader &shader) {
-
-	glm::mat4 model;
-	model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
-	int modelLoc = glGetUniformLocation(shader.ID, "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	
+void applyClipMatrix(const Shader &shader) {		
 	glm::mat4 view;	
 	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 	int viewLoc = glGetUniformLocation(shader.ID, "view");
@@ -229,12 +235,14 @@ int main() {
 	int ratioLocation = glGetUniformLocation(myShader.ID, "ratio");	
 
 	InputHandler input(window);	
+
+	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window)) {
 
 		processInput(input, window);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);		
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
 	
 		glUniform1f(ratioLocation, ratio);
 
@@ -246,8 +254,21 @@ int main() {
 
 		applyClipMatrix(myShader);
 		glBindVertexArray(VAO);
+		for (unsigned int i = 0; i < 10; i++)
+		{
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			int modelLoc = glGetUniformLocation(myShader.ID, "model");
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
