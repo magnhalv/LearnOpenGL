@@ -202,9 +202,12 @@ GLuint generateTexture(const char *path, bool hasAlpha) {
 
 void applyClipMatrix(const Shader &shader) {		
 	glm::mat4 view;	
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
+	view = glm::rotate(view, (float)glfwGetTime()*glm::radians(50.0f), glm::vec3(0.0f, 0.3f, 0.0f));
 	int viewLoc = glGetUniformLocation(shader.ID, "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+	
 
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
