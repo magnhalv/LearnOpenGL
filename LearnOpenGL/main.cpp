@@ -229,6 +229,45 @@ void applyClipMatrix(const Shader &shader) {
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
+float lastX = 400, lastY = 300;
+bool firstMouse = true;
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+	if (firstMouse) {
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
+
+	float sensitivity = 0.05;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(front);
+
+	std::cout << "X: " << front.x << ". Y: " << front.y << ". Z: " << front.z << std::endl;
+}
+
+
 int main() {
 	auto window = createWindow(800, 600);
 	
@@ -254,6 +293,8 @@ int main() {
 	InputHandler input(window);	
 
 	glEnable(GL_DEPTH_TEST);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
 	while (!glfwWindowShouldClose(window)) {
 
 		float currentFrame = glfwGetTime();
