@@ -100,11 +100,19 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+float deltaTime = 0.0f;	// Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
+float cameraSpeed = 0.05f; // adjust accordingly
+
 void processInput(InputHandler &input, GLFWwindow *window) {
 	if (input.keyPressed(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(window, true);
 	}
-
+	
 	if (input.keyPressed(GLFW_KEY_UP)) {
 		ratio = ratio >= 1 ? 1 : ratio + 0.1;
 	}
@@ -112,6 +120,15 @@ void processInput(InputHandler &input, GLFWwindow *window) {
 	if (input.keyPressed(GLFW_KEY_DOWN)) {
 		ratio = ratio <= 0 ? 0 : ratio - 0.1;
 	}
+	
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
 void setVboData(GLuint vbo, float *vertices, unsigned int length) {
@@ -200,16 +217,11 @@ GLuint generateTexture(const char *path, bool hasAlpha) {
 	return texture;
 }
 
-void applyClipMatrix(const Shader &shader) {		
-	float radius = 10.0f;
-	float camX = sin(glfwGetTime()) * radius;
-	float camZ = cos(glfwGetTime()) * radius;
+void applyClipMatrix(const Shader &shader) {			
 	glm::mat4 view;
-	view = glm::lookAt(glm::vec3(camX, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	int viewLoc = glGetUniformLocation(shader.ID, "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-	
 
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
@@ -243,6 +255,11 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window)) {
+
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		cameraSpeed = 2.5f * deltaTime;
 
 		processInput(input, window);
 
