@@ -109,25 +109,25 @@ float lastFrame = 0.0f; // Time of last frame
 float cameraSpeed = 0.05f; // adjust accordingly
 
 void processInput(InputHandler &input, GLFWwindow *window) {
-	if (input.keyPressed(GLFW_KEY_ESCAPE)) {
+	if (input.keyTapped(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(window, true);
 	}
 	
-	if (input.keyPressed(GLFW_KEY_UP)) {
+	if (input.keyTapped(GLFW_KEY_UP)) {
 		ratio = ratio >= 1 ? 1 : ratio + 0.1;
 	}
 
-	if (input.keyPressed(GLFW_KEY_DOWN)) {
+	if (input.keyTapped(GLFW_KEY_DOWN)) {
 		ratio = ratio <= 0 ? 0 : ratio - 0.1;
 	}
 	
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	if (input.keyDown(GLFW_KEY_W))
 		cameraPos += cameraSpeed * cameraFront;
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	if (input.keyDown(GLFW_KEY_S))
 		cameraPos -= cameraSpeed * cameraFront;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (input.keyDown(GLFW_KEY_A))
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (input.keyDown(GLFW_KEY_D))
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
@@ -217,6 +217,8 @@ GLuint generateTexture(const char *path, bool hasAlpha) {
 	return texture;
 }
 
+float fov = 45.0f;
+
 void applyClipMatrix(const Shader &shader) {			
 	glm::mat4 view;
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -224,7 +226,7 @@ void applyClipMatrix(const Shader &shader) {
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(fov), 800.0f/600.0f, 0.1f, 100.0f);
 	int projectionLoc = glGetUniformLocation(shader.ID, "projection");
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 }
@@ -263,10 +265,24 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	cameraFront = glm::normalize(front);
-
-	std::cout << "X: " << front.x << ". Y: " << front.y << ". Z: " << front.z << std::endl;
 }
 
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	if (fov >= 1.0f && fov <= 45.0f)
+		fov -= yoffset;
+	if (fov <= 1.0f)
+		fov = 1.0f;
+	if (fov >= 45.0f)
+		fov = 45.0f;
+}
+
+void updateCameraSpeed() {
+	float currentFrame = glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+	cameraSpeed = 2.5f * deltaTime;
+}
 
 int main() {
 	auto window = createWindow(800, 600);
@@ -297,10 +313,8 @@ int main() {
 	glfwSetCursorPosCallback(window, mouse_callback);
 	while (!glfwWindowShouldClose(window)) {
 
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-		cameraSpeed = 2.5f * deltaTime;
+		updateCameraSpeed();
+		glfwSetScrollCallback(window, scroll_callback);
 
 		processInput(input, window);
 
