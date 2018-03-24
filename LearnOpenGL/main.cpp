@@ -4,11 +4,14 @@
 #include <assert.h>
 #include "Shader.h"
 #include "InputHandler.h"
+#include "Camera.h";
 #include <stb_image\stb_image.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 2.5f);
 
 float ratio = 0;
 
@@ -100,15 +103,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
-float cameraSpeed = 0.05f; // adjust accordingly
 
-void processInput(InputHandler &input, GLFWwindow *window) {
+void processKeyboard(InputHandler &input, GLFWwindow *window) {
 	if (input.keyTapped(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(window, true);
 	}
@@ -122,13 +120,13 @@ void processInput(InputHandler &input, GLFWwindow *window) {
 	}
 	
 	if (input.keyDown(GLFW_KEY_W))
-		cameraPos += cameraSpeed * cameraFront;
+		camera.ProcessKeyboard(FORWARD, deltaTime);
 	if (input.keyDown(GLFW_KEY_S))
-		cameraPos -= cameraSpeed * cameraFront;
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
 	if (input.keyDown(GLFW_KEY_A))
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (input.keyDown(GLFW_KEY_D))
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
 void setVboData(GLuint vbo, float *vertices, unsigned int length) {
@@ -219,52 +217,16 @@ GLuint generateTexture(const char *path, bool hasAlpha) {
 
 float fov = 45.0f;
 
-void applyClipMatrix(const Shader &shader) {			
-	glm::mat4 view;
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-	int viewLoc = glGetUniformLocation(shader.ID, "view");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+void applyClipMatrix(const Shader &shader) {					
+	shader.setMat4("view", camera.GetView());
 
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(fov), 800.0f/600.0f, 0.1f, 100.0f);
-	int projectionLoc = glGetUniformLocation(shader.ID, "projection");
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	shader.setMat4("projection", projection);
 }
 
-float lastX = 400, lastY = 300;
-bool firstMouse = true;
-float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-float pitch = 0.0f;
-
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-	if (firstMouse) {
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
-
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos;
-	lastX = xpos;
-	lastY = ypos;
-
-	float sensitivity = 0.05;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
-
-	yaw += xoffset;
-	pitch += yoffset;
-
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-
-	glm::vec3 front;
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(pitch));
-	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront = glm::normalize(front);
+	camera.ProcessMouse(xpos, ypos);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -280,8 +242,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 void updateCameraSpeed() {
 	float currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
-	lastFrame = currentFrame;
-	cameraSpeed = 2.5f * deltaTime;
+	lastFrame = currentFrame;	
 }
 
 int main() {
@@ -310,13 +271,14 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);	
+
 	while (!glfwWindowShouldClose(window)) {
 
 		updateCameraSpeed();
 		glfwSetScrollCallback(window, scroll_callback);
 
-		processInput(input, window);
+		processKeyboard(input, window);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
