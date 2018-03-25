@@ -3,8 +3,15 @@
 Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath) {
 	std::string vShaderCode = readFile(vertexPath);
 	std::string fShaderCode = readFile(fragmentPath);
-	GLuint vShader = createShader(vShaderCode.c_str(), GL_VERTEX_SHADER);
-	GLuint fShader = createShader(fShaderCode.c_str(), GL_FRAGMENT_SHADER);
+	Compile(vShaderCode.c_str(), fShaderCode.c_str(), nullptr);
+}
+
+Shader::Shader() {
+}
+
+void Shader::Compile(const GLchar* vertexCode, const GLchar* fragmentCode, const GLchar *gShaderCode) {
+	GLuint vShader = createShader(vertexCode, GL_VERTEX_SHADER);
+	GLuint fShader = createShader(fragmentCode, GL_FRAGMENT_SHADER);
 	ID = linkShaderProgram(vShader, fShader);
 	glDeleteShader(vShader);
 	glDeleteShader(fShader);
