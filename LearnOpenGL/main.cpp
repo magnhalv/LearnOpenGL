@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "InputHandler.h"
 #include "Camera.h";
+#include "ResourceMananger.h"
 #include <stb_image\stb_image.h>
 
 #include <glm/glm.hpp>
@@ -190,31 +191,6 @@ GLFWwindow* createWindow(unsigned int xDim, unsigned int yDim) {
 	return window;
 }
 
-GLuint generateTexture(const char *path, bool hasAlpha) {
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
-	if (data) {
-		GLuint dataType = hasAlpha ? GL_RGBA : GL_RGB;
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, dataType, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
-	return texture;
-}
-
 float fov = 45.0f;
 
 void applyClipMatrix(const Shader &shader) {					
@@ -248,7 +224,7 @@ void updateCameraSpeed() {
 int main() {
 	auto window = createWindow(800, 600);
 	
-	Shader myShader("./shaders/vertex.glsl", "./shaders/fragment.glsl");
+	Shader myShader = ResourceManager::LoadShader("./shaders/vertex.glsl", "./shaders/fragment.glsl", nullptr, "default");
 	myShader.use();
 
 	GLuint VBO, VAO, EBO;
@@ -258,8 +234,8 @@ int main() {
 	//EBO = createEBO(rectangleIndices, sizeof(rectangleIndices));
 	glBindVertexArray(0);
 	
-	auto texture1 = generateTexture("./textures/wood_container.jpg", false);
-	auto texture2 = generateTexture("./textures/awesomeface.png", true);
+	auto texture1 = ResourceManager::LoadTexture("./textures/wood_container.jpg", false, "wood");
+	auto texture2 = ResourceManager::LoadTexture("./textures/awesomeface.png", true, "face");
 	
 
 	glUniform1i(glGetUniformLocation(myShader.ID, "texture1"), 0);
@@ -285,11 +261,11 @@ int main() {
 	
 		glUniform1f(ratioLocation, ratio);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
+		glActiveTexture(GL_TEXTURE0);		
+		texture1.Bind();
 
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
+		texture2.Bind();
 
 		applyClipMatrix(myShader);
 		glBindVertexArray(VAO);
@@ -304,8 +280,7 @@ int main() {
 			}
 
 			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
-			int modelLoc = glGetUniformLocation(myShader.ID, "model");
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			myShader.setMat4("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
