@@ -99,7 +99,7 @@ Texture2D ResourceManager::loadTextureFromFile(const GLchar *file, GLboolean has
 	}
 	// Load image
 	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true);
+	//stbi_set_flip_vertically_on_load(true);
 	unsigned char *image = stbi_load(file, &width, &height, &nrChannels, 0);
 	if (image) {
 		texture.Generate(width, height, image);

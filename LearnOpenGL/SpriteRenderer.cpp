@@ -4,6 +4,7 @@
 SpriteRenderer::SpriteRenderer(Shader &shader)
 {
 	this->shader = shader;
+	this->InitRenderData();
 }
 
 
