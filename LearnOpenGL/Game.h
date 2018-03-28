@@ -2,10 +2,13 @@
 
 #include "ResourceMananger.h"
 #include "SpriteRenderer.h"
+#include "GameLevel.h"
 
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <vector>
 
 enum GameState {
 	GAME_ACTIVE,
@@ -20,6 +23,9 @@ public:
 	GameState  State;
 	GLboolean  Keys[1024];
 	GLuint	   Width, Height;
+	std::vector<GameLevel> Levels;
+	GLuint Level;
+
 	// Constructor/Destructor
 	Game(GLuint width, GLuint height);
 	~Game();

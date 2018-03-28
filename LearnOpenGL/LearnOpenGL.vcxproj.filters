@@ -21,6 +21,12 @@
       <UniqueIdentifier>{2289aa79-c25f-4e7e-8dfb-cc3e01c5a09b}</UniqueIdentifier>
       <Extensions>c;cpp;</Extensions>
     </Filter>
+    <Filter Include="Resource Files\levels">
+      <UniqueIdentifier>{6a85c5af-b36f-4a35-b5d9-59b95868c8c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\textures">
+      <UniqueIdentifier>{badc6f37-093a-4bc5-bca0-7006184bddc0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -47,13 +53,31 @@
     <ClCompile Include="SpriteRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameLevel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\vertex.glsl">
+    <None Include="resources\levels\two.lvl">
+      <Filter>Resource Files\levels</Filter>
+    </None>
+    <None Include="resources\levels\three.lvl">
+      <Filter>Resource Files\levels</Filter>
+    </None>
+    <None Include="resources\levels\four.lvl">
+      <Filter>Resource Files\levels</Filter>
+    </None>
+    <None Include="shaders\sprite.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="shaders\fragment.glsl">
+    <None Include="shaders\sprite.vs">
       <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="resources\levels\one.lvl">
+      <Filter>Resource Files\levels</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -78,5 +102,25 @@
     <ClInclude Include="SpriteRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameLevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="textures\awesomeface.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="textures\block.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="textures\block_solid.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="textures\wood_container.jpg">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>

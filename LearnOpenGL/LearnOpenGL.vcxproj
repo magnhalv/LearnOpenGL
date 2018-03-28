@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameLevel.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ResourceMananger.cpp" />
@@ -29,17 +31,29 @@
     <ClCompile Include="Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fragment.glsl" />
-    <None Include="shaders\vertex.glsl" />
+    <None Include="resources\levels\four.lvl" />
+    <None Include="resources\levels\one.lvl" />
+    <None Include="resources\levels\three.lvl" />
+    <None Include="resources\levels\two.lvl" />
+    <None Include="shaders\sprite.frag" />
+    <None Include="shaders\sprite.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameLevel.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="ResourceMananger.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="Texture2D.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="textures\awesomeface.png" />
+    <Image Include="textures\block.png" />
+    <Image Include="textures\block_solid.png" />
+    <Image Include="textures\wood_container.jpg" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

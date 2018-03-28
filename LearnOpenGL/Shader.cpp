@@ -18,7 +18,6 @@ void Shader::Compile(const GLchar* vertexCode, const GLchar* fragmentCode, const
 }
 
 Shader &Shader::Use() {
-	std::cout << ID << std::endl;
 	glUseProgram(ID);
 	return *this;
 }
