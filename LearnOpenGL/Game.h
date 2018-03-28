@@ -51,4 +51,5 @@ public:
 private:
 
 	GLboolean isCollision(GameObject &one, GameObject &two);
+	GLboolean isCollision(BallObject &one, GameObject &two);	
 };

@@ -107,10 +107,9 @@ void Game::Render()
 {
 	if (State == GAME_ACTIVE)
 	{
-		// Draw background
 		auto background = ResourceManager::GetTexture("background");
 		Renderer->DrawSprite(background, glm::vec2(0, 0), glm::vec2(Width, Height), 0.0f);
-		// Draw level
+
 		Levels[Level].Draw(*Renderer);
 
 		Player->Draw(*Renderer);
@@ -118,12 +117,28 @@ void Game::Render()
 	}
 }
 
-GLboolean Game::isCollision(GameObject &one, GameObject &two) {
+// AABB - AABB collision
+GLboolean Game::isCollision(GameObject &one, GameObject &two)
+{
 	bool collisionX = one.Position.x + one.Size.x >= two.Position.x &&
 		two.Position.x + two.Size.x >= one.Position.x;
-
 	bool collisionY = one.Position.y + one.Size.y >= two.Position.y &&
 		two.Position.y + two.Size.y >= one.Position.y;
-
 	return collisionX && collisionY;
+}
+
+// AABB - Circle collision
+GLboolean Game::isCollision(BallObject &one, GameObject &two) {
+	glm::vec2 ballCenter(one.Position + one.Radius);
+
+	glm::vec2 aabb_half_extents(two.Size.x / 2, two.Size.y / 2);
+	glm::vec2 aabb_center(two.Position.x + aabb_half_extents.x, two.Position.y + aabb_half_extents.y);
+
+	glm::vec2 difference = ballCenter - aabb_center;
+	glm::vec2 clamped = glm::clamp(difference, -aabb_half_extents, aabb_half_extents);
+
+	glm::vec2 aabb_closest = aabb_center + clamped;
+
+	difference = aabb_closest - ballCenter;
+	return glm::length(difference) < one.Radius;
 }
