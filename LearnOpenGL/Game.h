@@ -38,14 +38,17 @@ public:
 	BallObject *Ball;
 
 
-	// Constructor/Destructor
+	
 	Game(GLuint width, GLuint height);
-	~Game();
-	// Initialize game state (load all shaders/textures/levels)
+	~Game();	
 	void Init();
-	// GameLoop
+	
+	// Game loop
+	void DoCollisions();
 	void ProcessInput(GLfloat dt);
 	void Update(GLfloat dt);
 	void Render();
 private:
+
+	GLboolean isCollision(GameObject &one, GameObject &two);
 };

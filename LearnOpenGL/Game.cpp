@@ -16,7 +16,7 @@ void Game::Init()
 	// Load shaders
 	ResourceManager::LoadShader("shaders/sprite.vs", "shaders/sprite.frag", nullptr, "sprite");
 	// Configure shaders
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(this->Width), static_cast<GLfloat>(this->Height), 0.0f, -1.0f, 1.0f);
+	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(Width), static_cast<GLfloat>(Height), 0.0f, -1.0f, 1.0f);
 	ResourceManager::GetShader("sprite").Use().SetInteger("sprite", 0);
 	ResourceManager::GetShader("sprite").SetMatrix4("projection", projection);
 	// Load textures
@@ -29,19 +29,19 @@ void Game::Init()
 	auto spriteShader = ResourceManager::GetShader("sprite");
 	Renderer = new SpriteRenderer(spriteShader);
 	// Load levels
-	GameLevel one; one.Load("resources/levels/one.lvl", this->Width, this->Height * 0.5);
-	GameLevel two; two.Load("resources/levels/two.lvl", this->Width, this->Height * 0.5);
-	GameLevel three; three.Load("resources/levels/three.lvl", this->Width, this->Height * 0.5);
-	GameLevel four; four.Load("resources/levels/four.lvl", this->Width, this->Height * 0.5);
-	this->Levels.push_back(one);
-	this->Levels.push_back(two);
-	this->Levels.push_back(three);
-	this->Levels.push_back(four);
-	this->Level = 0;
+	GameLevel one; one.Load("resources/levels/one.lvl", Width, Height * 0.5);
+	GameLevel two; two.Load("resources/levels/two.lvl", Width, Height * 0.5);
+	GameLevel three; three.Load("resources/levels/three.lvl", Width, Height * 0.5);
+	GameLevel four; four.Load("resources/levels/four.lvl", Width, Height * 0.5);
+	Levels.push_back(one);
+	Levels.push_back(two);
+	Levels.push_back(three);
+	Levels.push_back(four);
+	Level = 0;
 
 	glm::vec2 playerPos = glm::vec2(
-		this->Width / 2 - PLAYER_SIZE.x / 2,
-		this->Height - PLAYER_SIZE.y
+		Width / 2 - PLAYER_SIZE.x / 2,
+		Height - PLAYER_SIZE.y
 	);
 	Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::GetTexture("paddle"));
 
@@ -53,17 +53,33 @@ void Game::Init()
 
 void Game::Update(GLfloat dt)
 {
-	Ball->Move(dt, this->Width);
+	Ball->Move(dt, Width);
+	DoCollisions();
 }
 
 
+void Game::DoCollisions()
+{
+	for (GameObject &box : Levels[Level].Bricks)
+	{
+		if (!box.Destroyed)
+		{
+			if (isCollision(*Ball, box))
+			{
+				if (!box.IsSolid)
+					box.Destroyed = GL_TRUE;
+			}
+		}
+	}
+}
+
 void Game::ProcessInput(GLfloat dt)
 {
-	if (this->State == GAME_ACTIVE)
+	if (State == GAME_ACTIVE)
 	{
 		GLfloat velocity = PLAYER_VELOCITY * dt;
 
-		if (this->Keys[GLFW_KEY_A])
+		if (Keys[GLFW_KEY_A])
 		{
 			if (Player->Position.x >= 0) {				
 				Player->Position.x -= velocity;
@@ -72,9 +88,9 @@ void Game::ProcessInput(GLfloat dt)
 					Ball->Position.x -= velocity;
 			}				
 		}
-		if (this->Keys[GLFW_KEY_D])
+		if (Keys[GLFW_KEY_D])
 		{
-			if (Player->Position.x <= this->Width - Player->Size.x) {
+			if (Player->Position.x <= Width - Player->Size.x) {
 				Player->Position.x += velocity;
 
 				if (Ball->Stuck)
@@ -82,22 +98,32 @@ void Game::ProcessInput(GLfloat dt)
 			}
 		}
 
-		if (this->Keys[GLFW_KEY_SPACE])
+		if (Keys[GLFW_KEY_SPACE])
 			Ball->Stuck = false;
 	}
 }
 
 void Game::Render()
 {
-	if (this->State == GAME_ACTIVE)
+	if (State == GAME_ACTIVE)
 	{
 		// Draw background
 		auto background = ResourceManager::GetTexture("background");
-		Renderer->DrawSprite(background, glm::vec2(0, 0), glm::vec2(this->Width, this->Height), 0.0f);
+		Renderer->DrawSprite(background, glm::vec2(0, 0), glm::vec2(Width, Height), 0.0f);
 		// Draw level
-		this->Levels[this->Level].Draw(*Renderer);
+		Levels[Level].Draw(*Renderer);
 
 		Player->Draw(*Renderer);
 		Ball->Draw(*Renderer);
 	}
+}
+
+GLboolean Game::isCollision(GameObject &one, GameObject &two) {
+	bool collisionX = one.Position.x + one.Size.x >= two.Position.x &&
+		two.Position.x + two.Size.x >= one.Position.x;
+
+	bool collisionY = one.Position.y + one.Size.y >= two.Position.y &&
+		two.Position.y + two.Size.y >= one.Position.y;
+
+	return collisionX && collisionY;
 }
