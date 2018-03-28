@@ -1,6 +1,11 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
+#include "ResourceMananger.h"
+#include "SpriteRenderer.h"
+
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 enum GameState {
 	GAME_ACTIVE,
@@ -24,4 +29,5 @@ public:
 	void ProcessInput(GLfloat dt);
 	void Update(GLfloat dt);
 	void Render();
+private:
 };

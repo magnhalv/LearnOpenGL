@@ -24,6 +24,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ResourceMananger.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Texture2D.cpp" />
   </ItemGroup>
@@ -37,6 +38,7 @@
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="ResourceMananger.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="Texture2D.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -104,6 +106,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>

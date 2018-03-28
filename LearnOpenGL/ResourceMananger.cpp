@@ -101,9 +101,12 @@ Texture2D ResourceManager::loadTextureFromFile(const GLchar *file, GLboolean has
 	int width, height, nrChannels;
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char *image = stbi_load(file, &width, &height, &nrChannels, 0);
-	
-	// Now generate texture
-	texture.Generate(width, height, image);
+	if (image) {
+		texture.Generate(width, height, image);
+	}	
+	else {
+		std::cout << "Failed to load texture: " << file << std::endl;
+	}
 	// And finally free image data
 	stbi_image_free(image);
 	return texture;

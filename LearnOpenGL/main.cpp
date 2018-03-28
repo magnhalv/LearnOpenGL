@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 		Breakout.ProcessInput(deltaTime);
 
 		// Update Game state
-		Breakout.Update(deltaTime);
+		Breakout.Update(deltaTime);		
 
 		// Render
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

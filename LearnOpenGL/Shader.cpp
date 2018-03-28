@@ -17,22 +17,31 @@ void Shader::Compile(const GLchar* vertexCode, const GLchar* fragmentCode, const
 	glDeleteShader(fShader);
 }
 
-void Shader::use() {
+Shader &Shader::Use() {
+	std::cout << ID << std::endl;
 	glUseProgram(ID);
+	return *this;
 }
 
-void Shader::setBool(const std::string &name, bool value) const {
+void Shader::SetBool(const std::string &name, bool value) {
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 }
-void Shader::setInt(const std::string &name, int value) const {
+void Shader::SetInteger(const std::string &name, int value)  {
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
-void Shader::setFloat(const std::string &name, float value) const {
+void Shader::SetFloat(const std::string &name, float value) {
 	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Shader::setMat4(const std::string &name, glm::mat4 value) const {
+void Shader::SetMatrix4(const std::string &name, glm::mat4 value) {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void Shader::SetVector3f(const GLchar *name, glm::vec3 &value, GLboolean useShader)
+{
+	if (useShader)
+		this->Use();
+	glUniform3f(glGetUniformLocation(this->ID, name), value.x, value.y, value.z);
 }
 
 std::string Shader::readFile(const GLchar *path) const {
