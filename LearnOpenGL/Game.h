@@ -3,6 +3,7 @@
 #include "ResourceMananger.h"
 #include "SpriteRenderer.h"
 #include "GameLevel.h"
+#include "BallObject.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -25,6 +26,17 @@ public:
 	GLuint	   Width, Height;
 	std::vector<GameLevel> Levels;
 	GLuint Level;
+
+	SpriteRenderer *Renderer;
+	GameObject *Player;
+
+	const glm::vec2 PLAYER_SIZE;
+	const GLfloat PLAYER_VELOCITY;
+	
+	const glm::vec2 INITIAL_BALL_VELOCITY;
+	const GLfloat BALL_RADIUS = 12.5f;
+	BallObject *Ball;
+
 
 	// Constructor/Destructor
 	Game(GLuint width, GLuint height);

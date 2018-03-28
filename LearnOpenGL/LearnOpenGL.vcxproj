@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BallObject.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameLevel.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -39,6 +40,7 @@
     <None Include="shaders\sprite.vs" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BallObject.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameLevel.h" />
