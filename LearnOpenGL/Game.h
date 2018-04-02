@@ -4,12 +4,14 @@
 #include "SpriteRenderer.h"
 #include "GameLevel.h"
 #include "BallObject.h"
+#include "ParticaleGenerator.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <tuple>
 
 enum GameState {
 	GAME_ACTIVE,
@@ -17,10 +19,18 @@ enum GameState {
 	GAME_WIN
 };
 
+enum Direction {
+	UP,
+	RIGHT,
+	DOWN,
+	LEFT
+};
+
+typedef std::tuple<GLboolean, Direction, glm::vec2> Collision;
+
 class Game
 {
 public:
-	// Game state
 	GameState  State;
 	GLboolean  Keys[1024];
 	GLuint	   Width, Height;
@@ -37,6 +47,7 @@ public:
 	const GLfloat BALL_RADIUS = 12.5f;
 	BallObject *Ball;
 
+	ParticleGenerator *Particles;
 
 	
 	Game(GLuint width, GLuint height);
@@ -51,5 +62,8 @@ public:
 private:
 
 	GLboolean isCollision(GameObject &one, GameObject &two);
-	GLboolean isCollision(BallObject &one, GameObject &two);	
+	Collision isCollision(BallObject &one, GameObject &two);	
+	Direction VectorDirection(glm::vec2 target);
+	void resetLevel();
+	void resetPlayer();
 };

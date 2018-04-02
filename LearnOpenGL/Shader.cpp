@@ -36,11 +36,25 @@ void Shader::SetMatrix4(const std::string &name, glm::mat4 value) {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }
 
+void Shader::SetVector2f(const GLchar *name, glm::vec2 &value, GLboolean useShader)
+{
+	if (useShader)
+		this->Use();
+	glUniform2f(glGetUniformLocation(this->ID, name), value.x, value.y);
+}
+
 void Shader::SetVector3f(const GLchar *name, glm::vec3 &value, GLboolean useShader)
 {
 	if (useShader)
 		this->Use();
 	glUniform3f(glGetUniformLocation(this->ID, name), value.x, value.y, value.z);
+}
+
+void Shader::SetVector4f(const GLchar *name, glm::vec4 &value, GLboolean useShader)
+{
+	if (useShader)
+		this->Use();
+	glUniform4f(glGetUniformLocation(this->ID, name), value.x, value.y, value.z, value.w);
 }
 
 std::string Shader::readFile(const GLchar *path) const {

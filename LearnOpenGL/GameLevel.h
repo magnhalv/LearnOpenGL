@@ -16,6 +16,7 @@ public:
 	void Load(const GLchar *file, GLuint levelWidth, GLuint levelHeight);
 	void Draw(SpriteRenderer &renderer);
 	GLboolean IsCompleted();
+	void Reset();
 private:
 	void init(std::vector<std::vector<GLuint>> tileData, GLuint levelWidth, GLuint levelHeight);
 };

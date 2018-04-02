@@ -25,6 +25,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ParticaleGenerator.cpp" />
     <ClCompile Include="ResourceMananger.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SpriteRenderer.cpp" />
@@ -32,6 +33,8 @@
     <ClCompile Include="Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="particle.vs" />
+    <None Include="particle.frag" />
     <None Include="resources\levels\four.lvl" />
     <None Include="resources\levels\one.lvl" />
     <None Include="resources\levels\three.lvl" />
@@ -46,6 +49,7 @@
     <ClInclude Include="GameLevel.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="ParticaleGenerator.h" />
     <ClInclude Include="ResourceMananger.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SpriteRenderer.h" />

@@ -23,7 +23,9 @@ public:
 	void SetInteger(const std::string &name, int value);
 	void SetFloat(const std::string &name, float value);
 	void SetMatrix4(const std::string &name, glm::mat4 value);
-	void SetVector3f(const GLchar *name, glm::vec3 & value, GLboolean useShader = false);
+	void SetVector2f(const GLchar *name, glm::vec2 & value, GLboolean useShader = false);
+	void SetVector3f(const GLchar *name, glm::vec3 & value, GLboolean useShader = false);	
+	void SetVector4f(const GLchar *name, glm::vec4 & value, GLboolean useShader = false);
 private:
 	std::string readFile(const GLchar *filePath) const;
 	GLuint createShader(const char *sourceCode, GLuint shaderType);
